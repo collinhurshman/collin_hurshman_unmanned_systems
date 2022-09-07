@@ -24,3 +24,7 @@ for i, (itemx,itemy) in enumerate(zip(x,y)):
     print(i,itemx,itemy)
 
 plt.plot(x,y)
+
+def add(x:float,y:float) -> float:#don't HAVE to specify datatypes.. but can
+    #only works in python 3 +    
+    return x*y
