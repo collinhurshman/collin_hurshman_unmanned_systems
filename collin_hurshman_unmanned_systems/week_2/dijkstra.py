@@ -38,6 +38,8 @@ class DijkstraPath():
         self.start = start
         self.end = goal
         self.radius = robotRadius
+        self.obsRadius = self.grid.spacing/2 
+        #by default, assume obstacles only occupy their own node
         self.path = []
         self.cost = 0
     
@@ -57,7 +59,7 @@ class DijkstraPath():
         #returns true if node is valid, false otherwise
         flag = True
         for obs in self.obsList:
-            if self.distance(obs,(nodeObj.X,nodeObj.Y)) <= self.radius:
+            if self.distance(obs,(nodeObj.X,nodeObj.Y)) - self.radius  <= self.obsRadius:
                 #notice the robot IS allowed to rub right against the obstacles
                 flag = False
         if nodeObj.X < self.radius or nodeObj.X > self.grid.Xmax - self.radius:#check against size of grid
@@ -65,14 +67,17 @@ class DijkstraPath():
         if nodeObj.Y < self.radius or nodeObj.Y > self.grid.Ymax - self.radius:
             flag = False
         return flag
-        
+
+    def showPlots(self):
+        plt.show()
+
     def showBaseGrid(self):
         plt.figure()
         plt.axis([0,self.grid.Xmax+ self.grid.spacing,0,self.grid.Ymax+self.grid.spacing])#set x, y axes from 0 to 10 with padding for the text to fit
         plt.title('Workspace with Node Indices')
-        plt.show()
         xSpan = np.arange(0,self.grid.Xmax+self.grid.spacing,self.grid.spacing)#make sure to include Xmax by adding 1 extra spacing
         ySpan = np.arange(0,self.grid.Ymax+self.grid.spacing,self.grid.spacing)
+        
 
         for i in range(len(xSpan)):#apply the node eqn and plot each node number... row by row
             x = xSpan[i]
@@ -84,7 +89,7 @@ class DijkstraPath():
                     if x == obs[0] and y == obs[1]:#color node red if it is an obstacle
                         colorStr = "red"
                 plt.text(x,y,str(int(self.getNode(x,y,self.grid.Xmax,self.grid.spacing))),color = colorStr,fontsize = 8)
-        
+
                 
     def findPath(self, plotDesired:bool = 1):
         unvisited = {}
@@ -149,8 +154,10 @@ class DijkstraPath():
                 #NOW NEED TO ITERATE FROM ONE POINT TO THE NEXT, DRAWING LINE...
             for obs in self.obsList:
                 plt.plot(obs[0],obs[1],marker = "x",color = "r")
+                
         return self.path
-    
+#REMOVE THE BELOW ONCE THE CLASS HAS BEEN FULLY VETTED
+
 myGrid = Grid(10,10,0.5)
 startCoords = (0,0)
 endCoords = (8,9)
@@ -158,3 +165,4 @@ obsCoords = [(1,1),(4,4),(3,4),(5,0),(5,1),(0,7),(1,7),(2,7),(3,7)]
 dijkstra = DijkstraPath(myGrid,obsCoords,startCoords,endCoords,0.0)
 print(dijkstra.findPath())
 dijkstra.showBaseGrid()
+dijkstra.showPlots()
